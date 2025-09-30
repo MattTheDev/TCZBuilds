@@ -1,0 +1,28 @@
+REM #12919 - Mortal Dunk Booth
+REM #12997 - Mortal Character List
+
+@temp booth = #12919
+@temp chance = {@?desc $(booth):Chance}
+@temp roll = {@?rand 1=100}
+@temp sat = {@?desc $(booth):Sat}
+@temp lastRan = {@eval {@?time} - {@?desc $(booth):LastDunked}}
+@temp liquid = {@?desc $(booth):Liquid}
+
+@if {@eval $(lastRan) < 60} do
+	@echo %g%lPlease wait another %y%l{@?interval {@eval 60 - $(lastRan)}} %g%lto dunk another mortal.
+	@return
+@end
+
+@if {@eval $(roll) <= $(chance)} do 
+	@echo {@?status *$(sat) = colour}{@?name *$(sat)} %g%lplummets into the tank of %w%l$(liquid)%g%l!
+	@temp newMortal = {@?index #12997[{@?rand 1 = {@?noelements #12997}}]}
+	@temp newLiquid = {@?itemno {@?rand 1 = {@?noitems ";" {@?desc $(booth):Liquids}}} ";" {@?desc $(booth):Liquids}}
+	@echo {@?status *$(newMortal) = colour}{@?name *$(newMortal)} %g%lhops up into the dunkin booth filled with %w%l$(newLiquid)%g%l!
+	@desc $(booth):Chance = 5
+	@desc $(booth):Sat = $(newMortal)
+	@desc $(booth):LastDunked = {@?time}
+	@return
+@end
+
+@echo %g%lYou %r%l*%y%lmissed%r%l* %g%land failed to dunk {@?status *$(sat) = colour}{@?name *$(sat)}%g%l!
+@desc $(booth):Chance = {@eval $(chance) + 2}
