@@ -1,0 +1,14 @@
+REM #12919 - Mortal Dunk Booth
+REM #12997 - Mortal Character List
+
+@temp booth = #12919
+@if {@eval {@?strlen $3} == 0} do @mexec {@echo %g%lYou need to provide the name of a %y%lnon-admin %g%lto dunk, ie: %w%lMortalChange Dawgeth}{@return}
+@if {@eval not {@?exists *$1}} do @mexec {@echo %g%lYou need to provide a valid player name}{@return}
+@if {@eval {@eval {@?privs *$1} < 5} || {@eval {@?set *$1 = RETIRED}} do @mexec {@echo %g%lYou need to provide the name of a %w%lMortal%g%l, %rAssistant%w%l, or %r%lExperienced Builder}{@return}
+@if {@eval "{@?desc $(booth):Sat}" = "{@?id *$1}"} do @mexec {@echo {@?status *$1 = colour}{@?name *$1} %g%lis already in the booth}{@return}
+@temp newMortalId = {@?id *$1}
+@temp newLiquid = {@?itemno {@?rand 1 = {@?noitems ";" {@?desc $(booth):Liquids}}} ";" {@?desc $(booth):Liquids}}
+@if {@eval not {@?exists #12997[$(newMortalId)]}} do @desc #12997[$(newMortalId)] = {@?lastconnected *$(newMortalId)};0
+@desc $(booth):Sat = $(newMortalId)
+@desc $(booth):Liquid = $(newLiquid)
+@echo {@?status *$(newMortalId) = colour}{@?name *$(newMortalId)} %g%lis now in the booth, dangling over a tank of %w%l$(newLiquid)%g%l!
